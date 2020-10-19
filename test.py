@@ -4,9 +4,9 @@ hdul = fits.open('GALAH_DR3_main_200331.fits')
 
 hdul.info()
 print(hdul[1].header)
-print(hdul[1].data[0][42])
+print(hdul[1].data[0][2])
 
-max_field_id = 7365
+#max_field_id = 7365
 #for i in hdul[1].data:
 #	if i[3] > max_field_id:
 #		max_field_id = i[3]
@@ -103,8 +103,18 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 #print(gaia_ids_spec)
 #print("Out of {} targets, {} have abundances for {} elements".format(len(hdul[1].data),len(gaia_ids_spec),len(indices_spec)))
 
+###creates an array of just the source_id for each target, which includes date information
+#source_ids = []
+#for i in hdul[1].data:
+#    source_ids.append(i[1])
 
+###creates an array of just the 2018 source_ids
+#source_ids_2018 = []
+#for i in source_ids:
+#    if i > 180000000000000:
+#        source_ids_2018.append(i)
 
+#print(source_ids_2018, len(source_ids_2018), max(source_ids_2018))
 
 
 
