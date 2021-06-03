@@ -5,12 +5,25 @@ import numpy as np
 import lightkurve as lk
 from astropy.io import fits
 from astropy import units as u
+#import matplotlib		###was supposed to fix some weird failing in code, didn't
+#matplotlib.use('TKagg')
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
+<<<<<<< HEAD
+import lightkurve as lk
+from astropy.io import fits
+import csv
+from astropy.timeseries import BoxLeastSquares
+from transitleastsquares import transitleastsquares
+
+#hdul = fits.open('GALAH_DR3_main_200331.fits')
+#print(hdul[1].data[0][166:170],hdul[1].data[0][2])
+=======
 from astropy.timeseries import BoxLeastSquares
 from transitleastsquares import transitleastsquares
 from tess_stars2px import tess_stars2px_function_entry
 
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 
 def isfloat(value):
 	try:
@@ -19,6 +32,114 @@ def isfloat(value):
 	except ValueError:
 		return False
 
+<<<<<<< HEAD
+tic_ids = []
+tic_period = []
+tic_period_error = []
+with open('/home/ryan/Downloads/exofop_tess_tois_faint_no_FP.txt', 'r') as file:
+	reader = csv.reader(file,delimiter='\t')
+	#next(reader)
+	#next(reader)
+	#next(reader)
+	#next(reader)
+	#next(reader)
+	#next(reader)
+	for row in reader:
+		tic_ids.append(int(row[0].replace("'","")))
+		tic_period.append(float(row[25].replace("'","")))
+		if isfloat(row[26]) == True:
+			tic_period_error.append(float(row[26].replace("'","")))
+		elif isfloat(row[26]) == False:
+			tic_period_error.append(float(0.0))
+
+#print(toi_ids, toi_period, len(toi_ids))
+'''
+star_ids = []
+for i in hdul[1].data:
+	star_ids.append(i[2])
+
+star_ids_test = [234284556, 234523599]#, 267263253, 410153553,140068425,261136679,179317684,29857954,425997655,307210830,279741379,441462736,410214986,55652896,200723869] #star_ids[9:10]
+real_period = [1.106,3.796]#,4.127,0.463,2.281,6.268,4.231,9.477,17.667,2.253,7.790,14.277,8.138,17.089,18.371,]
+'''
+best_fit_period = []
+#well_fit_target = []
+#poor_fit_target = []
+failed_tic = []
+best_fit_uncert = []
+for j,i in enumerate(tic_ids):
+	try:
+		print(i)
+		star = eleanor.multi_sectors(tic=i, sectors='all')
+
+		#print('Found TIC {0} (Gaia {1}), with TESS magnitude {2}, RA {3}, and Dec {4}'
+		#     .format(star.tic, star.gaia, star.tess_mag, star.coords[0], star.coords[1]))
+
+		#data = eleanor.TargetData(star, height=15, width=15, bkg_size=31, do_psf=True, do_pca=True, regressors='corner')
+
+		#plt.figure(figsize=(15,5))
+
+		data = []
+		#plot_fmt = ['k.', 'r.','k.', 'r.']
+
+		for s in star:
+		    datum = eleanor.TargetData(s, height=15, width=15, bkg_size=31, do_psf=False, do_pca=False, aperture_mode='small')
+		    data.append(datum)
+
+		time = []
+		#time_1 = []
+		#time_2 = []
+		flux = []
+		#flux_1 = []
+		#flux_2 = []
+		#half_1 = []
+		#half_2 = []
+		background = []
+		for sector, datum in enumerate(data):
+		    q = datum.quality == 0
+		    #plt.plot(datum.time[q], datum.corr_flux[q]/np.median(datum.corr_flux[q]), plot_fmt[sector])
+		    #half_1 = datum[int(0.025*len(datum)):int(0.475*len(datum))]
+		    #half_2 = datum[int(0.525*len(datum)):int(0.975*len(datum))]
+		    time.append(datum.time[q])
+		    #time_2.append(half_2.time[q])
+
+		    flux.append(datum.corr_flux[q]/np.median(datum.corr_flux[q]))
+		    #flux_2.append(half_2.corr_flux[q]/np.median(half_2.corr_flux[q]))
+
+		    background.append(datum.flux_bkg[q])
+
+
+		print("Data downloaded correctly")
+
+
+		#time = np.concatenate((time))
+		#flux = np.concatenate((flux))
+
+		#plt.ylabel('Normalized Flux', fontsize=24)
+		#plt.xlabel('Time', fontsize=24)
+
+		#plt.show()
+
+		#print(time, flux)
+		time_array = np.concatenate((time[0:(len(time))]))
+		flux_array = np.concatenate((flux[0:(len(flux))]))
+		background_array = np.concatenate((background[0:len(background)]))
+
+		time_bkg = []
+		flux_bkg = []
+		for num, back in enumerate(background_array):
+			bkg_med = np.median(background_array)
+			if back < bkg_med*3:
+				time_bkg.append(time_array[num])
+				flux_bkg.append(flux_array[num])
+
+
+		print("Bad background points subtracted")
+
+		print(len(time_bkg))
+
+		###create lightcurve object
+		lc = lk.LightCurve(time = time_bkg, flux = flux_bkg).remove_outliers(sigma_lower=5, sigma_upper=3).flatten(51)
+=======
 galah_dr3 = fits.open('GALAH_DR3_main_allspec_v1.fits')
 
 mass_id = []
@@ -139,6 +260,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind]):
 	try:
 		###create lightcurve object
 		lc = lc.remove_outliers(sigma_lower=7, sigma_upper=3).flatten(window_length=51)
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 		#plt.figure(num=str(i) + "_1")
 		#plt.scatter(lc.time,lc.flux, c='k', marker='.')
 		#plt.title(i)
@@ -170,11 +292,19 @@ for j,i in enumerate(mass_id[beg_ind:end_ind]):
 		#dimen_per = periodogram.period_at_max_power
 		#dimless_per = float(dimen_per / (1. * u.d))
 		#best_fit_period.append(dimless_per)
+<<<<<<< HEAD
+		best_fit_period.append(results.period)
+		best_fit_uncert.append(results.period_uncertainty)
+
+		fold_lc = lc.fold(period=results.period)#, t0=periodogram.transit_time_at_max_power)
+		fold_lc_real = lc.fold(period=tic_period[j])
+=======
 		best_fit_period[j] = results.period
 		best_fit_uncert[j] = results.period_uncertainty
 
 		fold_lc = lc.fold(period=results.period)#, t0=periodogram.transit_time_at_max_power)
 		#fold_lc_real = lc.fold(period=tic_period[j])
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 		#plt.figure(num=str(i) + "_3")
 		#plt.scatter(fold_lc.time, fold_lc.flux, c='k', marker='.')
 		#plt.scatter(fold_lc_real.time, fold_lc_real.flux, c='r', marker='.')
@@ -196,6 +326,11 @@ for j,i in enumerate(mass_id[beg_ind:end_ind]):
 		#	poor_fit_target.append(i)
 	except: 
 		print('Target {} failed'.format(i))
+<<<<<<< HEAD
+		failed_tic.append(i)
+		best_fit_period.append(0.0)
+		best_fit_uncert.append(0.0)
+=======
 		#failed_tic.append(i)
 		best_fit_period[j] = 0.0
 		best_fit_uncert[j] = 0.0
@@ -213,6 +348,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind]):
 		print(e)
 		print('\nWriting to file failed \n')
 
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 	finally:
 		plt.close('all')
 
@@ -222,22 +358,39 @@ for j,i in enumerate(mass_id[beg_ind:end_ind]):
 #plt.show()
 
 #print(np.shape(toi_period), np.shape(best_fit_period))
+<<<<<<< HEAD
+period_arrays = np.stack((tic_period, tic_period_error, best_fit_period, best_fit_uncert), axis=1)
+#print(period_arrays)
+
+with open('/home/ryan/Documents/UNSW/UNSW_GALAH/tls_bkg_periods_small_sigma.txt', 'w') as file:
+	for number, values in enumerate(tic_period):
+		file.write(str(tic_period[number])+'\t'+str(tic_period_error[number])+'\t'+str(best_fit_period[number])+'\t'+str(best_fit_uncert[number])+'\n')
+=======
 #period_arrays = np.stack((tic_period, tic_period_error, best_fit_period, best_fit_uncert), axis=1)
 #print(period_arrays)
 
 with open('/home/rmorris/documents/eleanor_tls_periods_{}-{}.txt'.format(beg_ind, end_ind), 'w') as file:
 	for number, values in enumerate(mass_id[beg_ind:end_ind]):
 		file.write(str(mass_id[number])+'\t'+str(best_fit_period[number])+'\t'+str(best_fit_uncert[number])+'\n')
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 
 #print(well_fit_target)
 #print(poor_fit_target)
 #print(len(tic_ids), len(poor_fit_target), len(well_fit_target))
 
 
+<<<<<<< HEAD
+plt.scatter(tic_period,best_fit_period)
+plt.xlabel('ExoFOP Period')
+plt.ylabel('TLS Period')
+plt.title('Published vs Calculated Period')
+plt.show()
+=======
 #plt.scatter(tic_period,best_fit_period)
 #plt.xlabel('ExoFOP Period')
 #plt.ylabel('TLS Period')
 #plt.title('Published vs Calculated Period')
 #plt.savefig('/home/rmorris/documents/eleanor_tls_per_plot.png')
+>>>>>>> 16c1090c6bad8b5863f3e8b6888f01b5300804f7
 
 
