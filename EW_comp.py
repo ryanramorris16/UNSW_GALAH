@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
+date = 201003
 
 gaia_ids = []
 file_name = []
 equivwidth = []
 ew_err = []
-with open('/home/rmorris/documents/spectra_ew_YYMMDD/spectra_ew_201003.txt', 'r') as file:
+with open('/home/rmorris/documents/spectra_ew_YYMMDD/spectra_ew_{}.txt'.format(date), 'r') as file:
     reader = csv.reader(file,delimiter='\t')
     for row in reader:
         gaia_ids.append(row[0])
@@ -17,17 +18,19 @@ with open('/home/rmorris/documents/spectra_ew_YYMMDD/spectra_ew_201003.txt', 'r'
 
 class galah_target:
     
-    def __init__(self, EW, EW_err, files, ccd, gaia_id):
+    def __init__(self, EW, EW_err, files, ccd, gaia_id, date):
         self.files = files
         self.ccd = ccd
         self.fullEW = EW
         self.fullEWerr = EW_err
         self.gaia = gaia_id
+        self.date = date
         
         self.separate()
         self.outlier()
         if self.gaia in self.marked:
             self.plotting()
+            self.writeout()
         
         
     def separate(self):
@@ -104,7 +107,7 @@ class galah_target:
     def writeout(self):
         ### problem with writeout since all have dif EW1/3 lengths
         file = open('/home/rmorris/documents/ew_outliers.txt', "a")
-        file.write(str(self.gaia)+'\t'+str(self.EW1)+'\t'+str(self.EW1err)+'\t'+str(self.EW3)+'\t'+str(self.EW3err)+'\n')
+        file.write(str(self.gaia)+'\t'+str(self.date)+'\n')
         file.close()
         
 for j, i in enumerate(gaia_ids):
@@ -122,7 +125,7 @@ for j, i in enumerate(gaia_ids):
             ccd[k] = file_name[indices][-6]
         #print(EW)
         #print(ccd)
-        test = galah_target(EW, EW_err, files, ccd, i)
+        test = galah_target(EW, EW_err, files, ccd, i, date)
         #print(test.EW1)
     else:
         print('Target already measured')
