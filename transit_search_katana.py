@@ -1,29 +1,19 @@
 import os
 import csv
-import sys
 import glob
-import eleanor
 import numpy as np
-import scipy.stats as stats
 import lightkurve as lk
+from eleanor import mast
 from astropy.io import fits
-from astropy import units as u
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from astropy.coordinates import SkyCoord
-from astropy.timeseries import BoxLeastSquares
-from transitleastsquares import transitleastsquares
-from transitleastsquares import catalog_info
-from transitleastsquares import resample
 from transitleastsquares import transit_mask
-from tess_stars2px import tess_stars2px_function_entry
 from target_data_functions import corrected_flux
-from target_data_functions import get_cbvs
+from transitleastsquares import transitleastsquares
 from transitleastsquares.stats import calculate_stretch
 from transitleastsquares.stats import all_transit_times
 from transitleastsquares.transit import fractional_transit
 import transitleastsquares.tls_constants as tls_constants
-from eleanor import mast
 
 
 
