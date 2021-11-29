@@ -79,12 +79,13 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                 else:
                     skip = 0
         if skip == 0:     
-            if sector <= 37:
+            if sector < 39.5:
     ###first try to find 2-min data for this sector
                 try:
                     print(j, sector)
                     data = fits.open('/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_120s.fits'.format(TIC,sector))
                     source='lightkurve'
+                    ending = '120s'
                     #print("Sector {} found locally with LightKurve".format(sector))
                 except KeyboardInterrupt:
                     raise
@@ -94,11 +95,13 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                     try:
                         data = fits.open('/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_20s.fits'.format(TIC,sector))
                         source = 'lightkurve'
+                        ending = '20s'
                     except Exception as e:
                         #print('Data does not already exist @ 20-s cadence with Lightkurve')
                         try:
-                            data = fits.open('/srv/scratch/astro/z5318114/GALAH/eleanor/{}_s{}.fits'.format(TIC,sector)) #have to change for katana storage
+                            data = fits.open('/srv/scratch/astro/z5318114/GALAH/eleanor/{}_s{}_ffi.fits'.format(TIC,sector)) #have to change for katana storage
                             source='eleanor'
+                            ending = 'ffi'
                             #print("Sector {} found locally with eleanor".format(sector))
                         except KeyboardInterrupt:
                             raise
@@ -138,7 +141,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                                         print("Nah, this one isn't happening:", e)
 
                 try:                
-                    if os.path.isfile('/srv/scratch/astro/z5318114/GALAH/{}/{}_s{}.fits'.format(source,TIC,sector)):    
+                    if os.path.isfile('/srv/scratch/astro/z5318114/GALAH/{}/{}_s{}_{}.fits'.format(source,TIC,sector,ending)):    
                         #os.system('rclone copy /srv/scratch/astro/z5318114/GALAH/{}/{}_s{}.fits CloudStor:/{}/'.format(source,TIC,sector,source))
                         totalfile = open('/home/z5318114/targets_ran.txt',"a")
                         totalfile.write(str(source_ids[j])+'\t'+str(sector)+'\t'+str(TIC)+'\t'+str(Tmag_eleanor)+'\t'+str(Tmag_ticgen)+'\t'+str(source)+'\n')
