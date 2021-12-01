@@ -85,6 +85,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                     print(j, sector)
                     data = fits.open('/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_120s.fits'.format(TIC,sector))
                     source='lightkurve'
+                    ending = '120s'
                     #print("Sector {} found locally with LightKurve".format(sector))
                 except Exception as e:
                     #print(e)
@@ -92,11 +93,13 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                     try:
                         data = fits.open('/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_20s.fits'.format(TIC,sector))
                         source = 'lightkurve'
+                        ending = '20s'
                     except Exception as e:
                         #print('Data does not already exist @ 20-s cadence with Lightkurve')
                         try:
                             data = fits.open('/srv/scratch/astro/z5318114/GALAH/eleanor/{}_s{}_ffi.fits'.format(TIC,sector)) #have to change for katana storage
                             source='eleanor'
+                            ending = 'ffi'
                             #print("Sector {} found locally with eleanor".format(sector))
                         except Exception as e:
                             #print(e)
