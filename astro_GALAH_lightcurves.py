@@ -70,24 +70,22 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
         eleanor_ap = 'normal'
     for num, sector in enumerate(outSec):
         skip = 0
-        if source_ids[j] in done_id:
-            done_indices = [qj for qj, qi in enumerate(done_id) if qi == source_ids[j]]   #done_id.index(source_ids[j])
+        if str(source_ids[j]) in done_id:
+            done_indices = [qj for qj, qi in enumerate(done_id) if qi == str(source_ids[j])]   #done_id.index(source_ids[j])
             for asd in done_indices:
-                if sector == done_sec[asd]:
+                if sector == int(done_sec[asd]):
                     skip = 1
                     break
                 else:
                     skip = 0
         if skip == 0:     
-            if sector <= 37:
+            if sector < 39.5:
     ###first try to find 2-min data for this sector
                 try:
                     print(j, sector)
                     data = fits.open('/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_120s.fits'.format(TIC,sector))
                     source='lightkurve'
                     #print("Sector {} found locally with LightKurve".format(sector))
-                except KeyboardInterrupt:
-                    raise
                 except Exception as e:
                     #print(e)
                     #print('Data does not already exist @ 2-min cadence with Lightkurve')
@@ -97,11 +95,9 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                     except Exception as e:
                         #print('Data does not already exist @ 20-s cadence with Lightkurve')
                         try:
-                            data = fits.open('/srv/scratch/astro/z5318114/GALAH/eleanor/{}_s{}.fits'.format(TIC,sector)) #have to change for katana storage
+                            data = fits.open('/srv/scratch/astro/z5318114/GALAH/eleanor/{}_s{}_ffi.fits'.format(TIC,sector)) #have to change for katana storage
                             source='eleanor'
                             #print("Sector {} found locally with eleanor".format(sector))
-                        except KeyboardInterrupt:
-                            raise
                         except Exception as e:
                             #print(e)
                             #print('Data does not already exist @ 30/10-min cadence with eleanor')
@@ -111,6 +107,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                                 lc.download(download_dir='/srv/scratch/astro/z5318114/GALAH/lightkurve/')
                                 os.rename('/srv/scratch/astro/z5318114/GALAH/lightkurve/mastDownload/TESS/{}/{}'.format(twomin_file[0:-8],twomin_file),'/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_120s.fits'.format(TIC,sector))
                                 source = 'lightkurve'
+                                ending = '120s'
                                 #print('Sector {} downloaded with LightKurve'.format(sector))
                             except Exception as e:
                                 #print(e)
@@ -121,6 +118,7 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                                     lc.download(download_dir='/srv/scratch/astro/z5318114/GALAH/lightkurve/')
                                     os.rename('/srv/scratch/astro/z5318114/GALAH/lightkurve/mastDownload/TESS/{}/{}'.format(twentys_file[0:-8],twentys_file), '/srv/scratch/astro/z5318114/GALAH/lightkurve/{}_s{}_20s.fits'.format(TIC,sector))
                                     source = 'lightkurve'	
+                                    ending = '20s'
                                 except Exception as e:
                                     #print(e)
                                     #print('This target has 20s data, very cool man, very cool.')
@@ -131,14 +129,13 @@ for j,i in enumerate(mass_id[beg_ind:end_ind], start=beg_ind):
                                         datum = eleanor.TargetData(star, height=15, width=15, bkg_size=31, do_psf=False, do_pca=True, aperture_mode=eleanor_ap, save_postcard=False)
                                         datum.save(output_fn='{}_s{}_ffi.fits'.format(TIC,sector),directory='/srv/scratch/astro/z5318114/GALAH/eleanor/')
                                         source = 'eleanor'
+                                        ending = 'ffi'
                                         #print("Sector {} downloaded with eleanor".format(sector))
-                                    except KeyboardInterrupt:
-                                        raise
                                     except Exception as e:
                                         print("Nah, this one isn't happening:", e)
 
                 try:                
-                    if os.path.isfile('/srv/scratch/astro/z5318114/GALAH/{}/{}_s{}.fits'.format(source,TIC,sector)):    
+                    if os.path.isfile('/srv/scratch/astro/z5318114/GALAH/{}/{}_s{}_{}.fits'.format(source,TIC,sector,ending)):    
                         #os.system('rclone copy /srv/scratch/astro/z5318114/GALAH/{}/{}_s{}.fits CloudStor:/{}/'.format(source,TIC,sector,source))
                         totalfile = open('/home/z5318114/targets_ran.txt',"a")
                         totalfile.write(str(source_ids[j])+'\t'+str(sector)+'\t'+str(TIC)+'\t'+str(Tmag_eleanor)+'\t'+str(Tmag_ticgen)+'\t'+str(source)+'\n')
